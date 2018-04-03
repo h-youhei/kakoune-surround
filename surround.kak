@@ -71,7 +71,7 @@ r,[,]: bracket block
 a,<,>: angle block
 ",Q:   double quote string
 \',q:   single quote string
-`,g:   grove quote string
+`,g:   grave quote string
 t:     markup tag
 '
 }
@@ -79,7 +79,7 @@ t:     markup tag
 define-command -hidden _change-surround-info %{
 	info -title 'change surround' 'enter char to select surrounder
 (),[],{},<>: surround with the pair
-others:      surround with the charactr
+others:      surround with the character
 '
 }
 
@@ -94,12 +94,12 @@ define-command surround-with-tag %{ evaluate-commands %{
 }}
 
 define-command delete-surrounding-tag %{
-	_select-surrounding-tag
+	select-surrounding-tag
 	execute-keys d<space>
 }
 
 define-command change-surrounding-tag %{
-	_select-surrounding-tag
+	select-surrounding-tag
 	execute-keys '<a-i>c<lt>/?,><ret>)'
 	_activate-hooks-tag-attribute-handler
 	execute-keys c
@@ -115,7 +115,7 @@ define-command -hidden _activate-hooks-tag-attribute-handler %{
 	}
 }
 
-define-command _select-surrounding-tag %{
+define-command select-surrounding-tag %{
 	execute-keys ';Ge<a-;>'
 	%sh{
 		tag_list=`echo "$kak_selection" | grep -P -o '(?<=<)[^>]+(?=>)'`

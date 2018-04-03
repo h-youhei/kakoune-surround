@@ -18,7 +18,7 @@ You can also surround with tag
 
 `:surround<ret>` `t`
 
-start insert mode inside angle both side of selection | means cursor here.
+start insert mode inside angle both side of selection, | means cursor here.
 ```
 <|>abc</|>
 ```
