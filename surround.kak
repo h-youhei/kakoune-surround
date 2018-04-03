@@ -94,12 +94,12 @@ define-command surround-with-tag %{ evaluate-commands %{
 }}
 
 define-command delete-surrounding-tag %{
-	select-surrounding-tag
+	evaluate-commands -itersel _select-surrounding-tag
 	execute-keys d<space>
 }
 
 define-command change-surrounding-tag %{
-	select-surrounding-tag
+	evaluate-commands -itersel _select-surrounding-tag
 	execute-keys '<a-i>c<lt>/?,><ret>)'
 	_activate-hooks-tag-attribute-handler
 	execute-keys c
@@ -115,7 +115,7 @@ define-command -hidden _activate-hooks-tag-attribute-handler %{
 	}
 }
 
-define-command select-surrounding-tag %{
+define-command -hidden _select-surrounding-tag %{
 	execute-keys ';Ge<a-;>'
 	%sh{
 		tag_list=`echo "$kak_selection" | grep -P -o '(?<=<)[^>]+(?=>)'`
