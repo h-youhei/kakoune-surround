@@ -1,6 +1,18 @@
 # Surround plugin for Kakoune
 
-## Surround
+## Usage
+These commands are exposed to map or alias.
+- surround
+- change-surround
+- delete-surround
+- select-surround
+- surround-with-tag
+- delete-surrounding-tag
+- change-surrounding-tag
+- select-surrounding-tag
+
+## Feature
+### Surround
 ```
 abc
 ```
@@ -26,7 +38,7 @@ If insert space while the context, close tag is confirmed and you can continue t
 ```
 <div |>abc</div>
 ```
-## Change surrounder
+### Change surrounder
 ```
 'abc'
 ```
@@ -57,7 +69,7 @@ If insert space while the context, close tag is confirmed and you can continue t
 <section |>abc</section>
 ```
 
-## Delete surrounder
+### Delete surrounder
 ```
 {abc}
 ```

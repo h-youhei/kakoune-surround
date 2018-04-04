@@ -1,36 +1,3 @@
-define-command delete-surround %!
-	_surrounding-object-info 'delete surround'
-	on-key %@ %sh^
-		case $kak_key in
-		b|'('|')'|B|'{'|'}'|r|'['|']'|a|'<lt>'|'<gt>'|'"'|Q|"'"|q|'`'|g)
-			#use $val{key}. if use $kak_key, it break quote case
-			echo '_select-surrounding-pair %val{key}'
-			echo 'execute-keys d<space>' ;;
-		t) echo delete-surrounding-tag ;;
-		#to close information window, use execute-keys
-		*) echo 'execute-keys :nop<ret>' ;;
-		esac
-	^@
-!
-
-define-command -hidden -params 2 _change-surround %{ execute-keys "r%arg{1}<space>r%arg{2}<space>;" } 
-define-command change-surround %!
-	_surrounding-object-info 'change-surround'
-	on-key %@ %sh^
-		case $kak_key in
-		b|'('|')'|B|'{'|'}'|r|'['|']'|a|'<lt>'|'<gt>'|'"'|Q|"'"|q|'`'|g)
-			#use $val{key}. if use $kak_key, it break quote case
-			echo '_select-surrounding-pair %val{key}'
-			echo '_change-surround-info'
-			#use $val{key}. if use $kak_key, it break quote case
-			echo 'on-key %{ _impl-surround _change-surround %val{key} }' ;;
-		t) echo change-surrounding-tag ;;
-		#to close information window, use execute-keys
-		*) echo 'execute-keys :nop<ret>' ;;
-		esac
-	^@
-!
-
 define-command -hidden -params 2 _surround %{ execute-keys "i%arg{1}<esc>a%arg{2}<esc>" }
 define-command surround %{
 	info -title 'surround' 'enter char to select surrounder
@@ -48,7 +15,54 @@ others:      surround with the character
 	}}
 }
 
+define-command delete-surround %!
+	_surrounding-object-info 'delete surround'
+	on-key %@ %sh^
+		case $kak_key in
+		b|'('|')'|B|'{'|'}'|r|'['|']'|a|'<lt>'|'<gt>'|'"'|Q|"'"|q|'`'|g)
+			#use $val{key}. if use $kak_key, it break quote case
+			echo '_select-surrounding-pair %val{key}'
+			echo 'execute-keys d<space>' ;;
+		t) echo delete-surrounding-tag ;;
+		#to close information window, use execute-keys
+		*) echo 'execute-keys :nop<ret>' ;;
+		esac
+	^@
+!
+
+define-command -hidden -params 2 _change-surround %{ execute-keys "r%arg{1}<space>r%arg{2}<space>;" } 
+define-command change-surround %!
+	_surrounding-object-info 'change surround'
+	on-key %@ %sh^
+		case $kak_key in
+		b|'('|')'|B|'{'|'}'|r|'['|']'|a|'<lt>'|'<gt>'|'"'|Q|"'"|q|'`'|g)
+			#use $val{key}. if use $kak_key, it break quote case
+			echo '_select-surrounding-pair %val{key}'
+			echo '_change-surround-info'
+			#use $val{key}. if use $kak_key, it break quote case
+			echo 'on-key %{ _impl-surround _change-surround %val{key} }' ;;
+		t) echo change-surrounding-tag ;;
+		#to close information window, use execute-keys
+		*) echo 'execute-keys :nop<ret>' ;;
+		esac
+	^@
+!
+
 define-command -hidden -params 1 _select-surrounding-pair %{ execute-keys "<a-a>%arg{1}<a-S>" }
+define-command select-surround %!
+	_surrounding-object-info 'select surround'
+	on-key %@ %sh^
+		case $kak_key in
+		b|'('|')'|B|'{'|'}'|r|'['|']'|a|'<lt>'|'<gt>'|'"'|Q|"'"|q|'`'|g)
+			#use $val{key}. if use $kak_key, it break quote case
+			echo '_select-surrounding-pair %val{key}' ;;
+		t) echo select-surrounding-tag ;;
+		#to close information window, use execute-keys
+		*) echo 'execute-keys :nop<ret>' ;;
+		esac
+	^@
+!
+
 define-command -hidden -params 2 _impl-surround %! %sh@
 	command=$1
 	case $2 in
@@ -103,6 +117,11 @@ define-command change-surrounding-tag %{
 	execute-keys '<a-i>c<lt>/?,><ret>)'
 	_activate-hooks-tag-attribute-handler
 	execute-keys c
+}
+
+define-command select-surrounding-tag %{
+	evaluate-commands -itersel _select-boundary-of-surrounding-tag
+	execute-keys '<a-a>c<lt>/?,><ret>'
 }
 
 define-command -hidden _activate-hooks-tag-attribute-handler %{
