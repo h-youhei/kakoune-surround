@@ -106,11 +106,11 @@ define-command change-surrounding-tag %{
 }
 
 define-command -hidden _activate-hooks-tag-attribute-handler %{
-	hook -group surround-tag-attribute-handler window InsertKey <space> %{
+	hook -group surround-tag-attribute-handler window RawKey <space> %{
 		execute-keys '<backspace>'
 		_select-odds
-		remove-hooks window surround-tag-attribute-handler
 		execute-keys '<space>'
+		remove-hooks window surround-tag-attribute-handler
 	}
 	hook -group surround-tag-attribute-handler window ModeChange insert:normal %{
 		remove-hooks window surround-tag-attribute-handler
