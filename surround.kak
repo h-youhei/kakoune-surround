@@ -30,17 +30,13 @@ define-command delete-surround %!
 	^@
 !
 
-define-command -hidden -params 2 _change-surround %{ execute-keys "r%arg{1}<space>r%arg{2}<space>;" } 
 define-command change-surround %!
 	_surrounding-object-info 'change surround'
 	on-key %@ %sh^
 		case $kak_key in
 		b|'('|')'|B|'{'|'}'|r|'['|']'|a|'<lt>'|'<gt>'|'"'|Q|"'"|q|'`'|g)
 			#use $val{key}. if use $kak_key, it break quote case
-			echo '_select-surrounding-pair %val{key}'
-			echo '_change-surround-info'
-			#use $val{key}. if use $kak_key, it break quote case
-			echo 'on-key %{ _impl-surround _change-surround %val{key} }' ;;
+			echo '_change-surrounding-pair %val{key}' ;;
 		t) echo change-surrounding-tag ;;
 		#to close information window, use execute-keys
 		*) echo 'execute-keys :nop<ret>' ;;
@@ -89,6 +85,23 @@ a,<,>: angle block
 t:     markup tag
 '
 }
+
+define-command -hidden _change-surrounding-pair -params 1 %{ %sh{
+	#restore selection within on-key to use itersel
+	selections=$kak_selections_desc
+	#while discard this selection whithin proceeding process,
+	#use this command to show what is going to be selected
+	echo '_select-surrounding-pair %arg{1}'
+	echo _change-surround-info
+	echo "on-key %{
+		select $selections
+		evaluate-commands -itersel %{
+			_select-surrounding-pair %arg{1}
+			_impl-surround _change-surround %val{key}
+		}
+	}"
+}}
+define-command -hidden -params 2 _change-surround %{ execute-keys "r%arg{1}<space>r%arg{2}" }
 
 define-command -hidden _change-surround-info %{
 	info -title 'change surround' 'enter char to select surrounder
