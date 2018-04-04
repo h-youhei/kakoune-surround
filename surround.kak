@@ -94,12 +94,12 @@ define-command surround-with-tag %{ evaluate-commands %{
 }}
 
 define-command delete-surrounding-tag %{
-	evaluate-commands -itersel _select-surrounding-tag
+	evaluate-commands -itersel _select-surrounding-tag-include-space
 	execute-keys d<space>
 }
 
 define-command change-surrounding-tag %{
-	evaluate-commands -itersel _select-surrounding-tag
+	evaluate-commands -itersel _select-boundary-of-surrounding-tag
 	execute-keys '<a-i>c<lt>/?,><ret>)'
 	_activate-hooks-tag-attribute-handler
 	execute-keys c
@@ -132,7 +132,15 @@ define-command -hidden _select-odds %{ %sh{
 	echo "select ${accum_selections#:}"
 }}
 
-define-command -hidden _select-surrounding-tag %{
+#use evaluate-commands to restore mark
+define-command -hidden _select-surrounding-tag-include-space %{ evaluate-commands %{
+	_select-boundary-of-surrounding-tag
+	execute-keys -save-regs '' 'Z<space><a-a>c\\s*<lt>/,><ret><a-Z>a'
+	execute-keys -save-regs '' 'z(<space><a-a>c<lt>,>\\h*\\n?<ret>'
+	execute-keys -save-regs '' '<a-z>a'
+}}
+
+define-command -hidden _select-boundary-of-surrounding-tag %{
 	execute-keys ';Ge<a-;>'
 	%sh{
 		tag_list=`echo "$kak_selection" | grep -P -o '(?<=<)[^>]+(?=>)'`
@@ -159,6 +167,6 @@ define-command -hidden _select-surrounding-tag %{
 			fi
 		done
 		echo "execute-keys '<a-a>c<lt>$close>,<lt>/$close><ret>'"
-		echo "execute-keys '<a-S><a-a>>'"
 	}
+	execute-keys '<a-S>'
 }
