@@ -107,13 +107,30 @@ define-command change-surrounding-tag %{
 
 define-command -hidden _activate-hooks-tag-attribute-handler %{
 	hook -group surround-tag-attribute-handler window InsertKey <space> %{
-		execute-keys '<backspace><a-;><space><space>'
+		execute-keys '<backspace>'
+		_select-odds
 		remove-hooks window surround-tag-attribute-handler
+		execute-keys '<space>'
 	}
 	hook -group surround-tag-attribute-handler window ModeChange insert:normal %{
 		remove-hooks window surround-tag-attribute-handler
 	}
 }
+
+define-command -hidden _select-odds %{ %sh{
+	IFS=:
+	accum_selections=
+	is_odd=0
+	for selection in $kak_selections_desc ; do
+		if [ $is_odd -eq 0 ] ; then
+			is_odd=1
+			accum_selections=$accum_selections:$selection
+		else
+			is_odd=0
+		fi
+	done
+	echo "select ${accum_selections#:}"
+}}
 
 define-command -hidden _select-surrounding-tag %{
 	execute-keys ';Ge<a-;>'
