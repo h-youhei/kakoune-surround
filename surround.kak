@@ -22,7 +22,7 @@ define-command delete-surround %!
 		b|'('|')'|B|'{'|'}'|r|'['|']'|a|'<lt>'|'<gt>'|'"'|Q|"'"|q|'`'|g)
 			#use $val{key}. if use $kak_key, it break quote case
 			echo '_select-surrounding-pair %val{key}'
-			echo 'execute-keys d<space>' ;;
+			echo 'execute-keys d' ;;
 		t) echo delete-surrounding-tag ;;
 		#to close information window, use execute-keys
 		*) echo 'execute-keys :nop<ret>' ;;
@@ -121,8 +121,8 @@ define-command surround-with-tag %{ evaluate-commands %{
 }}
 
 define-command delete-surrounding-tag %{
-	evaluate-commands -itersel _select-surrounding-tag-include-space
-	execute-keys d<space>
+	evaluate-commands -itersel _select-surrounding-tag-including-space
+	execute-keys d
 }
 
 define-command change-surrounding-tag %{
@@ -165,7 +165,7 @@ define-command -hidden _select-odds %{ %sh{
 }}
 
 #use evaluate-commands to restore mark
-define-command -hidden _select-surrounding-tag-include-space %{ evaluate-commands %{
+define-command -hidden _select-surrounding-tag-including-space %{ evaluate-commands %{
 	_select-boundary-of-surrounding-tag
 	execute-keys -save-regs '' 'Z<space><a-a>c\\s*<lt>/,><ret><a-Z>a'
 	execute-keys -save-regs '' 'z(<space><a-a>c<lt>,>\\h*\\n?<ret>'
@@ -175,10 +175,10 @@ define-command -hidden _select-surrounding-tag-include-space %{ evaluate-command
 define-command -hidden _select-boundary-of-surrounding-tag %{
 	execute-keys ';Ge<a-;>'
 	%sh{
-		tag_list=`echo "$kak_selection" | grep -P -o '(?<=<)[^>]+(?=>)'`
+		tag_list=`echo "$kak_selection" | grep -P -o '(?<=<)[^>]+(?=>)' | cut -d ' ' -f 1`
 		open=
 		open_stack=
-		close=
+		result=
 		for tag in $tag_list ; do
 			if [ `echo $tag | cut -c 1` != / ] ; then
 				case $tag in
@@ -193,12 +193,12 @@ define-command -hidden _select-boundary-of-surrounding-tag %{
 					open_stack=${open_stack#*\\n}
 					open=`echo $open_stack | head -n 1`
 				else
-					close=${tag#/}
+					result=${tag#/}
 					break
 				fi
 			fi
 		done
-		echo "execute-keys '<a-a>c<lt>$close>,<lt>/$close><ret>'"
+		echo "execute-keys '<a-a>c<lt>$result\s?[^>]*>,<lt>/$result><ret>'"
 	}
 	execute-keys '<a-S>'
 }
