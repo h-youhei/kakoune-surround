@@ -173,7 +173,13 @@ define-command -hidden _select-surrounding-tag-including-space %{ evaluate-comma
 }}
 
 define-command -hidden _select-boundary-of-surrounding-tag %{
-	execute-keys ';Ge<a-;>'
+	execute-keys \;
+	try %{
+		execute-keys -draft '<a-i>>s><ret>'
+	} catch %{
+		execute-keys '<a-a>>'
+	}
+	execute-keys 'Ge<a-;>'
 	%sh{
 		tag_list=`echo "$kak_selection" | grep -P -o '(?<=<)[^>]+(?=>)' | cut -d ' ' -f 1`
 		open=
