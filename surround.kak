@@ -174,10 +174,15 @@ define-command -hidden _select-surrounding-tag-including-space %{ evaluate-comma
 
 define-command -hidden _select-boundary-of-surrounding-tag %{
 	execute-keys \;
+	#handle inside open tag
 	try %{
-		execute-keys -draft '<a-i>>s><ret>'
+		#<a-a>> produce side effect inside close tag
+		#that make tag_list include the close tag
+		execute-keys -draft '<a-a>c<lt>/,><ret>'
 	} catch %{
-		execute-keys '<a-a>>'
+		try %{
+			execute-keys '<a-a>>'
+		}
 	}
 	execute-keys 'Ge<a-;>'
 	%sh{
