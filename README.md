@@ -11,6 +11,19 @@ These commands are exposed to map or alias.
 - change-surrounding-tag
 - select-surrounding-tag
 
+For example,
+```
+map global normal 'some key' ':surround<ret>'
+```
+Or you can use user mode.
+```
+declare-user-mode surround
+map global surround s ':surround<ret>'
+map global surround c ':change-surround<ret>'
+map global surround d ':delete-surround<ret>'
+map global normal 'some key' ':enter-user-mode surround<ret>'
+```
+
 ## Feature
 ### Surround
 ```
