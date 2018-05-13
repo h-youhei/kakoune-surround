@@ -75,7 +75,7 @@ define-command -hidden -params 2 _impl-surround %! %sh@
 
 define-command -hidden -params 1 _surrounding-object-info %{
 	info -title %arg{1} 'select surrounding object
-b,(,): paranthes block
+b,(,): parentheses block
 B,{,}: braces block
 r,[,]: bracket block
 a,<,>: angle block
