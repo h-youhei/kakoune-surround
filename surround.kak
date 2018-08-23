@@ -5,7 +5,7 @@ define-command surround %{
 t:           surround with markup tag
 others:      surround with the character
 '
-	on-key %{ %sh{
+	on-key %{ eval %sh{
 		if [ $kak_key = t ] ; then
 			echo surround-with-tag
 		else
@@ -17,7 +17,7 @@ others:      surround with the character
 
 define-command delete-surround %!
 	_surrounding-object-info 'delete surround'
-	on-key %@ %sh^
+	on-key %@ eval %sh^
 		case $kak_key in
 		b|'('|')'|B|'{'|'}'|r|'['|']'|a|'<lt>'|'<gt>'|'"'|Q|"'"|q|'`'|g)
 			#use $val{key}. if use $kak_key, it break quote case
@@ -32,7 +32,7 @@ define-command delete-surround %!
 
 define-command change-surround %!
 	_surrounding-object-info 'change surround'
-	on-key %@ %sh^
+	on-key %@ eval %sh^
 		case $kak_key in
 		b|'('|')'|B|'{'|'}'|r|'['|']'|a|'<lt>'|'<gt>'|'"'|Q|"'"|q|'`'|g)
 			#use $val{key}. if use $kak_key, it break quote case
@@ -47,7 +47,7 @@ define-command change-surround %!
 define-command -hidden -params 1 _select-surrounding-pair %{ execute-keys "<a-a>%arg{1}<a-S>" }
 define-command select-surround %!
 	_surrounding-object-info 'select surround'
-	on-key %@ %sh^
+	on-key %@ eval %sh^
 		case $kak_key in
 		b|'('|')'|B|'{'|'}'|r|'['|']'|a|'<lt>'|'<gt>'|'"'|Q|"'"|q|'`'|g)
 			#use $val{key}. if use $kak_key, it break quote case
@@ -59,7 +59,7 @@ define-command select-surround %!
 	^@
 !
 
-define-command -hidden -params 2 _impl-surround %! %sh@
+define-command -hidden -params 2 _impl-surround %! eval %sh@
 	command=$1
 	case $2 in
 	'('|')') open='('; close=')' ;;
@@ -80,13 +80,13 @@ B,{,}: braces block
 r,[,]: bracket block
 a,<,>: angle block
 ",Q:   double quote string
-\',q:   single quote string
+'',q:   single quote string
 `,g:   grave quote string
 t:     markup tag
 '
 }
 
-define-command -hidden _change-surrounding-pair -params 1 %{ %sh{
+define-command -hidden _change-surrounding-pair -params 1 %{ eval %sh{
 	#restore selection within on-key to use itersel
 	selections=$kak_selections_desc
 	#while discard this selection whithin proceeding process,
@@ -149,7 +149,7 @@ define-command -hidden _activate-hooks-tag-attribute-handler %{
 	}
 }
 
-define-command -hidden _select-odds %{ %sh{
+define-command -hidden _select-odds %{ eval %sh{
 	IFS=:
 	accum_selections=
 	is_odd=0
@@ -185,7 +185,7 @@ define-command -hidden _select-boundary-of-surrounding-tag %{
 		}
 	}
 	execute-keys 'Ge<a-;>'
-	%sh{
+	eval %sh{
 		tag_list=`echo "$kak_selection" | grep -P -o '(?<=<)[^>]+(?=>)' | cut -d ' ' -f 1`
 		open=
 		open_stack=
