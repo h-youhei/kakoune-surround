@@ -125,7 +125,7 @@ define-command surround-with-tag %{ evaluate-commands %{
 	execute-keys '<a-a>c<lt>>,<lt>/><ret>'
 	execute-keys '<a-S><a-a>>s><ret>)'
 	_activate-hooks-tag-attribute-handler
-	execute-keys i
+	execute-keys -with-hooks i
 }}
 
 define-command delete-surrounding-tag %{
@@ -137,7 +137,7 @@ define-command change-surrounding-tag %{
 	evaluate-commands -itersel _select-boundary-of-surrounding-tag
 	execute-keys '<a-i>c<lt>/?,><ret>)'
 	_activate-hooks-tag-attribute-handler
-	execute-keys c
+	execute-keys -with-hooks c
 }
 
 define-command select-surrounding-tag %{
@@ -146,7 +146,7 @@ define-command select-surrounding-tag %{
 }
 
 define-command -hidden _activate-hooks-tag-attribute-handler %{
-	hook -group surround-tag-attribute-handler window RawKey <space> %{
+	hook -group surround-tag-attribute-handler window RawKey '<space>' %{
 		execute-keys '<backspace>'
 		_select-odds
 		execute-keys '<space>'
@@ -156,20 +156,20 @@ define-command -hidden _activate-hooks-tag-attribute-handler %{
 		remove-hooks window surround-tag-attribute-handler
 	}
 }
-
+#for multiple selection
 define-command -hidden _select-odds %{ eval %sh{
-	IFS=:
+	# IFS=' '
 	accum_selections=
 	is_odd=0
 	for selection in $kak_selections_desc ; do
 		if [ $is_odd -eq 0 ] ; then
 			is_odd=1
-			accum_selections=$accum_selections:$selection
+			accum_selections="$accum_selections $selection"
 		else
 			is_odd=0
 		fi
 	done
-	echo "select ${accum_selections#:}"
+	echo "select$accum_selections"
 }}
 
 #use evaluate-commands to restore mark
