@@ -79,7 +79,7 @@ r,[,]: bracket block
 a,<,>: angle block
 ",Q:   double quote string
 '',q:   single quote string
-,g:   grave quote string
+`,g:   grave quote string
 t:     markup tag
 '
 }
@@ -210,7 +210,7 @@ define-command -hidden _select-boundary-of-surrounding-tag %{
 	}
 	execute-keys 'Ge<a-;>'
 	eval %sh{
-		tag_list=`echo "$kak_selection" | grep -P -o '(?<=<)[>]+(?=>)' | cut -d ' ' -f 1`
+		tag_list=`echo "$kak_selection" | grep -P -o '(?<=<)[^>]+(?=>)' | cut -d ' ' -f 1`
 		open=
 		open_stack=
 		result=
