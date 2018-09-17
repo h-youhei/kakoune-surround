@@ -1,9 +1,15 @@
 define-command -hidden -params 2 _surround %{ execute-keys "i%arg{1}<esc>a%arg{2}<esc>" }
 define-command surround %{
 	info -title 'surround' 'enter char to select surrounder
-(),[],{},<>: surround with the pair
-t:           surround with markup tag
-others:      surround with the character
+b,(,):  parentheses block
+B,{,}:  braces block
+r,[,]:  bracket block
+a,<,>:  angle block
+",Q:    double quote string
+'',q:    single quote string
+`,g:    grave quote string
+t:      markup tag
+others: pressed character
 '
 	on-key %{ eval %sh{
 		if [ $kak_key = t ] ; then
@@ -62,12 +68,14 @@ define-command select-surround %!
 define-command -hidden -params 2 _impl-surround %! eval %sh@
 	command=$1
 	case $2 in
-	'('|')') open='('; close=')' ;;
-	'['|']') open='['; close=']' ;;
-	'{'|'}') open='{'; close='}' ;;
-	'<lt>'|'<gt>') open='<lt>'; close='>' ;;
-	\')  open="<'>"; close="<'>" ;;
-	\") open='<">'; close='<">' ;;
+	b|'('|')') open='('; close=')' ;;
+	r|'['|']') open='['; close=']' ;;
+	B|'{'|'}') open='{'; close='}' ;;
+	a|'<lt>'|'<gt>') open='<lt>'; close='>' ;;
+	#also catch ' " to escape quotes
+	q|\')  open="<'>"; close="<'>" ;;
+	Q|\") open='<">'; close='<">' ;;
+	g) open='`'; close='`' ;;
 	*) open=$2; close=$2 ;;
 	esac
 	echo "$command $open $close"
