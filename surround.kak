@@ -1,16 +1,6 @@
 define-command -hidden -params 2 _surround %{ execute-keys "i%arg{1}<esc>a%arg{2}<esc>" }
 define-command surround %{
-	info -title 'surround' 'enter char to select surrounder
-b,(,):  parentheses block
-B,{,}:  braces block
-r,[,]:  bracket block
-a,<,>:  angle block
-",Q:    double quote string
-'',q:    single quote string
-`,g:    grave quote string
-t:      markup tag
-others: pressed character
-'
+	_surrounder-info 'surround'
 	on-key %{ eval %sh{
 		if [ $kak_key = t ] ; then
 			echo surround-with-tag
@@ -89,17 +79,47 @@ r,[,]: bracket block
 a,<,>: angle block
 ",Q:   double quote string
 '',q:   single quote string
-`,g:   grave quote string
+,g:   grave quote string
 t:     markup tag
+'
+}
+
+define-command -hidden -params 1 _surrounder-info %{
+	info -title %arg{1} 'enter char to select surrounder
+b,(,):  parentheses block
+B,{,}:  braces block
+r,[,]:  bracket block
+a,<,>:  angle block
+",Q:    double quote string
+'',q:    single quote string
+`,g:    grave quote string
+t:      markup tag
+others: pressed character
+'
+}
+
+#after implement change surround pair for tag,
+# remove this command, and use _surrounder-info
+define-command -hidden _change-surround-info %{
+	info -title 'change surround' 'enter char to select surrounder
+b,(,):  parentheses block
+B,{,}:  braces block
+r,[,]:  bracket block
+a,<,>:  angle block
+",Q:    double quote string
+'',q:    single quote string
+`,g:    grave quote string
+others: pressed character
 '
 }
 
 define-command -hidden _change-surrounding-pair -params 1 %{ eval %sh{
 	#restore selection within on-key to use itersel
-	selections=$kak_selections_desc
-	#while discard this selection whithin proceeding process,
+	selections="$kak_selections_desc"
+	#while discard this selection within proceeding process,
 	#use this command to show what is going to be selected
 	echo '_select-surrounding-pair %arg{1}'
+	# echo "_surrounder-info 'change surround'"
 	echo _change-surround-info
 	echo "on-key %{
 		select $selections
@@ -110,13 +130,6 @@ define-command -hidden _change-surrounding-pair -params 1 %{ eval %sh{
 	}"
 }}
 define-command -hidden -params 2 _change-surround %{ execute-keys "r%arg{1}<space>r%arg{2}" }
-
-define-command -hidden _change-surround-info %{
-	info -title 'change surround' 'enter char to select surrounder
-(),[],{},<>: surround with the pair
-others:      surround with the character
-'
-}
 
 #use evaluate-commands to collapse undo history
 define-command surround-with-tag %{ evaluate-commands %{
@@ -148,7 +161,7 @@ define-command select-surrounding-tag %{
 define-command -hidden _activate-hooks-tag-attribute-handler %{
 	hook -group surround-tag-attribute-handler window RawKey '<space>' %{
 		execute-keys '<backspace>'
-		_select-odds
+		_keep-odds
 		execute-keys '<space>'
 		remove-hooks window surround-tag-attribute-handler
 	}
@@ -156,9 +169,11 @@ define-command -hidden _activate-hooks-tag-attribute-handler %{
 		remove-hooks window surround-tag-attribute-handler
 	}
 }
+
 #for multiple selection
-define-command -hidden _select-odds %{ eval %sh{
-	# IFS=' '
+#odd selections is open tag
+#even selections is close tag
+define-command -hidden _keep-odds %{ eval %sh{
 	accum_selections=
 	is_odd=0
 	for selection in $kak_selections_desc ; do
@@ -169,6 +184,7 @@ define-command -hidden _select-odds %{ eval %sh{
 			is_odd=0
 		fi
 	done
+	#accum_selections has space on head
 	echo "select$accum_selections"
 }}
 
@@ -194,7 +210,7 @@ define-command -hidden _select-boundary-of-surrounding-tag %{
 	}
 	execute-keys 'Ge<a-;>'
 	eval %sh{
-		tag_list=`echo "$kak_selection" | grep -P -o '(?<=<)[^>]+(?=>)' | cut -d ' ' -f 1`
+		tag_list=`echo "$kak_selection" | grep -P -o '(?<=<)[>]+(?=>)' | cut -d ' ' -f 1`
 		open=
 		open_stack=
 		result=
